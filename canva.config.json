@@ -1,18 +1,5 @@
 {
   "appId": "pagemint-canva-app",
   "appOrigin": "https://app-pagemint.canva-apps.com",
-  "entry": "src/app.tsx",
-  "backend": {
-    "host": "${PAGEMINT_API_URL}",
-    "routes": [
-      {
-        "path": "/api/canva/resources/find",
-        "method": "POST",
-        "handler": "src/backend/find.ts"
-      }
-    ]
-  },
-  "contentExtension": {
-    "type": "image"
-  }
+  "entry": "src/app.tsx"
 }

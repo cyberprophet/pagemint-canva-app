@@ -2,17 +2,11 @@
   "$schema": "https://www.canva.dev/schemas/app-manifest.json",
   "id": "pagemint-canva-app",
   "name": "PageMint",
-  "description": "Import your completed PageMint designs into Canva as images.",
-  "type": "content_extension",
-  "content": {
-    "types": ["image"],
-    "search": {
-      "endpoint": "/api/canva/resources/find"
-    }
-  },
+  "description": "Paste a PageMint share link to drop the design onto your Canva page.",
+  "type": "app",
   "permissions": [
-    "canva:design:read",
-    "canva:design:write"
+    "canva:design:content:write",
+    "canva:asset:content:write"
   ],
   "icon": "assets/icon.png"
 }
