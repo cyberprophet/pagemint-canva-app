@@ -2,15 +2,15 @@
   "name": "pagemint-canva-app",
   "version": "0.1.0",
   "private": true,
-  "description": "Canva content extension that imports PageMint designs from the authenticated user's sessions.",
+  "description": "Canva app that imports PageMint designs via a pasted share link.",
   "scripts": {
     "start": "webpack serve --mode development",
     "build": "webpack --mode production",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint --ext .ts,.tsx src"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@canva/app-ui-kit": "^4.0.0",
+    "@canva/asset": "^1.0.0",
     "@canva/design": "^1.0.0",
     "@canva/platform": "^1.0.0",
     "react": "^18.2.0",

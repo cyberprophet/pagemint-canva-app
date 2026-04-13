@@ -1,87 +1,60 @@
-# PageMint Canva content extension
+# PageMint Canva app
 
-Canva content-extension app that lets users browse their completed
-[PageMint](https://page.mint.surf) designs from inside the Canva editor's
-Apps sidebar and drop them into a design as images.
-
-This repo ships **Intent 020 Phase C** of the PageMint roadmap. See
+Canva app that imports a PageMint design into the active Canva page via a
+pasted share link. This is **Intent 020 Phase C** of the PageMint
+roadmap — see
 [`intents/020-design-tool-export.md`](https://github.com/cyberprophet/page-mint/blob/main/intents/020-design-tool-export.md)
-in the PageMint monorepo for the intent spec and research notes.
+in the PageMint monorepo for the intent spec.
 
-## Architecture
+## Flow
 
 ```
+PageMint (page.mint.surf)
+    │
+    │  User clicks "Share" → gets a share link
+    │  (e.g. https://page.mint.surf/s/ABC123)
+    ▼
+User copies the link
+
 Canva editor
-     │
-     │  POST /resources/find   (Canva content-extension contract)
-     ▼
-src/backend/find.ts            (this repo — forwarder)
-     │
-     │  POST {PAGEMINT_API_URL}/api/canva/resources/find
-     │  Authorization: Bearer <pagemint-token>
-     ▼
-creative-server CanvaController
-     │
-     │  STUB (this PR): returns empty list
-     │  Follow-up PR: OAuth link → ChatRepository → completed sessions
-     ▼
-Canva UI renders the list of user designs
+    │
+    │  Apps → PageMint → paste link → Import
+    ▼
+src/app.tsx
+    │
+    │  1. Normalize link → {origin}/s/{token}/image
+    │  2. fetch(imageUrl)           ← CORS-friendly PNG proxy on PageMint
+    │  3. upload({ type: "IMAGE", … })  ← Canva asset SDK
+    │  4. addNativeElement({ type: "IMAGE", ref })
+    ▼
+Design dropped onto the active Canva page
 ```
 
-The PageMint-side adapter endpoint is stubbed in
-[`cyberprophet/creative-server`](https://github.com/cyberprophet/creative-server)
-PR `feat/intent-020-phase-c-canva-adapter` — it returns an empty list until
-the Canva ↔ PageMint OAuth flow lands.
+No OAuth server required on the PageMint side — the share link is public
+by design, and the `/s/{token}/image` endpoint is served with
+`Access-Control-Allow-Origin: *` so the fetch works from the Canva app
+origin. A future Phase C.2 PR may add authenticated "Browse my sessions"
+via OAuth2, but v1 ships the paste-URL flow because it is shippable today
+without any external review coupling.
 
 ## Local development
 
-1. Install dependencies: `npm install`
-2. Copy env: `cp .env.example .env` and set `PAGEMINT_API_URL` to your local
-   creative-server (e.g. `http://localhost:15409`).
-3. Run the dev server: `npm run start`
-4. In the [Canva Developer Portal](https://www.canva.com/developers/apps),
-   create a new content-extension app, point its "Development URL" at the
-   webpack-dev-server, and install it into a test design.
-
-## PageMint API adapter contract
-
-`find.ts` forwards the Canva search request verbatim to the PageMint
-server. Request shape:
-
-```json
-{
-  "query": "cafe",
-  "pagination": { "continuation": null, "limit": 20 },
-  "locale": "en-US"
-}
-```
-
-Response shape (returned to Canva):
-
-```json
-{
-  "resources": [
-    {
-      "id": "session-123",
-      "name": "Spring Cafe Promo",
-      "url": "https://api-page.mint.surf/s/<token>.png",
-      "contentType": "image/png",
-      "thumbnail": { "url": "https://api-page.mint.surf/s/<token>.png?w=256" }
-    }
-  ],
-  "continuation": null
-}
-```
+1. `npm install`
+2. `npm run start` — webpack-dev-server
+3. In the [Canva Developer Portal](https://www.canva.com/developers/apps),
+   create a new App, point its "Development URL" at
+   `http://localhost:8080` (or whatever webpack-dev-server is using), and
+   install it into a test Canva design.
+4. In the test design, open **Apps → PageMint**, paste a PageMint share
+   link, click **Import**.
 
 ## Submission checklist (Canva marketplace, free tier)
 
-- [ ] Production `PAGEMINT_API_URL` deployed with CORS allowing `*.canva.com`
-- [ ] Canva ↔ PageMint OAuth flow live (follow-up PR)
 - [ ] App icon (512×512 PNG) added to `assets/icon.png`
 - [ ] Privacy policy URL published on page.mint.surf
 - [ ] Terms of service URL published on page.mint.surf
-- [ ] Screenshots of the Apps sidebar experience (3-5 images)
-- [ ] Review notes covering the OAuth consent flow + test account credentials
+- [ ] Screenshots (3-5) of the paste-link experience
+- [ ] Test PageMint share link that reviewers can use to verify import
 - [ ] Submit via the Canva Developer Portal "Submit for review" button
 
 ## License
