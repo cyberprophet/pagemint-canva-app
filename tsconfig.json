@@ -11,7 +11,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "lib": ["DOM", "DOM.Iterable", "ES2020"],
-    "types": ["node"]
+    "types": ["node", "jest"],
+    "paths": {
+      "@canva/platform": ["./node_modules/@canva/platform/index.d.ts"],
+      "@canva/design": ["./node_modules/@canva/design/index.d.ts"],
+      "@canva/asset": ["./node_modules/@canva/asset/index.d.ts"]
+    }
   },
   "include": ["src/**/*"]
 }
