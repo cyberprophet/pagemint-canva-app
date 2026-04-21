@@ -1,7 +1,7 @@
 {
   "private": true,
-  "name": "pagemint-fresh",
-  "description": "An empty Canva App",
+  "name": "pagemint-canva-app",
+  "description": "Canva app that imports PageMint designs via hash-fragment token + HTML fetch (Intent 048).",
   "scripts": {
     "extract": "formatjs extract \"src/**/*.{ts,tsx}\" --out-file dist/messages_en.json",
     "build": "webpack --config webpack.config.ts --mode production && npm run extract",
