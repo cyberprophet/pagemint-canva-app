@@ -1,5 +1,0 @@
-{
-  "appId": "pagemint-canva-app",
-  "appOrigin": "https://app-pagemint.canva-apps.com",
-  "entry": "src/app.tsx"
-}

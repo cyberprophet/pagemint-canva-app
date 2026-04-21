@@ -6,7 +6,7 @@ import { Alert, Rows, Text, Title } from "@canva/app-ui-kit";
  * Instructs the user to launch the app from PageMint rather than opening
  * it manually from inside the Canva editor.
  */
-export function NoTokenNotice(): JSX.Element {
+export function NoTokenNotice(): React.JSX.Element {
   return (
     <Rows spacing="2u">
       <Title size="medium">PageMint</Title>

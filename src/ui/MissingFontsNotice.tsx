@@ -11,7 +11,7 @@ type Props = {
  * be resolved to a Canva FontRef. Those elements fall back to Canva's
  * default sans-serif font.
  */
-export function MissingFontsNotice({ fonts, onDismiss }: Props): JSX.Element | null {
+export function MissingFontsNotice({ fonts, onDismiss }: Props): React.JSX.Element | null {
   if (fonts.length === 0) return null;
 
   return (
