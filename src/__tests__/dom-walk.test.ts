@@ -78,9 +78,12 @@ describe("walkDom", () => {
     // At least one shape in the output
     const shapes = result.filter((el) => el.type === "shape") as ShapeElementDesc[];
     expect(shapes.length).toBeGreaterThan(0);
-    expect(shapes[0].fillHex).toBe("#3366ff");
-    expect(shapes[0].widthPx).toBe(800);
-    expect(shapes[0].heightPx).toBe(120);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(shapes[0]!.fillHex).toBe("#3366ff");
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(shapes[0]!.widthPx).toBe(800);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(shapes[0]!.heightPx).toBe(120);
   });
 
   it("accumulates top positions across elements", () => {
@@ -93,7 +96,8 @@ describe("walkDom", () => {
 
     const result = walkDom(html);
     expect(result).toHaveLength(2);
-    const [h1, p] = result as TextElementDesc[];
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const [h1, p] = result as [TextElementDesc, TextElementDesc];
     expect(h1.top).toBe(0);
     // p.top should be after h1's height (32+4) plus 8px gap
     expect(p.top).toBe(32 + 4 + 8);
@@ -111,7 +115,7 @@ describe("walkDom", () => {
 
     const result = walkDom(html);
     expect(result).toHaveLength(2);
-    const [s1, s2] = result as TextElementDesc[];
+    const [s1, s2] = result as [TextElementDesc, TextElementDesc];
     // s1.top = 0, height = 24
     // s2.top should be 24 + 16 (section gap) = 40
     expect(s1.top).toBe(0);

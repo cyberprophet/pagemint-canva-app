@@ -12,7 +12,7 @@ type Props = {
  * A non-empty error list means some elements failed; the rest were still
  * imported (emit loop does not abort on individual failures).
  */
-export function ErrorAlert({ errors, onDismiss }: Props): JSX.Element | null {
+export function ErrorAlert({ errors, onDismiss }: Props): React.JSX.Element | null {
   if (errors.length === 0) return null;
 
   return (

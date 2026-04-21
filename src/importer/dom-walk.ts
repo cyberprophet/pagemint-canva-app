@@ -87,7 +87,9 @@ function colorToHex(value: string): string {
   if (m) {
     return (
       "#" +
-      [m[1], m[2], m[3]]
+      // m[1..3] are guaranteed to exist when the regex matches (non-null assertion safe)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      [m[1]!, m[2]!, m[3]!]
         .map((n) => parseInt(n, 10).toString(16).padStart(2, "0"))
         .join("")
     );
@@ -169,7 +171,9 @@ export function walkDom(html: string): ElementDesc[] {
     sections.length > 0 ? sections : [doc.body];
 
   for (let si = 0; si < roots.length; si++) {
-    const section = roots[si];
+    // roots[si] is always defined — the loop bound guarantees it
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const section = roots[si]!;
     if (si > 0) cursor += SECTION_GAP;
 
     const sectionStyle = styleOf(section);
@@ -215,7 +219,9 @@ export function walkDom(html: string): ElementDesc[] {
         const rawColor = cs["color"] ?? "#000000";
         const colorHex = colorToHex(rawColor);
         const fontFamily =
-          cs["font-family"]?.replace(/['"]/g, "").split(",")[0].trim() ??
+          // split(",")[0] is always defined when the array is non-empty
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          cs["font-family"]?.replace(/['"]/g, "").split(",")[0]!.trim() ??
           "sans-serif";
         const rawWeight = cs["font-weight"] ?? "normal";
         const fontWeight: "normal" | "bold" =
@@ -350,7 +356,9 @@ function walkNestedElements(parent: Element, startTop: number): ElementDesc[] {
           parseInt(cs["font-weight"] ?? "400", 10) >= 700 ? "bold" : "normal",
         colorHex: colorToHex(cs["color"] ?? "#000000"),
         fontFamily:
-          cs["font-family"]?.replace(/['"]/g, "").split(",")[0].trim() ??
+          // split(",")[0] is always defined when the array is non-empty
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          cs["font-family"]?.replace(/['"]/g, "").split(",")[0]!.trim() ??
           "sans-serif",
         alignment: "start",
         top: cursor,

@@ -12,7 +12,7 @@ type Props = {
 /**
  * Displays a progress bar + counter while elements are being emitted.
  */
-export function ProgressView({ percent, current, total, onCancel }: Props): JSX.Element {
+export function ProgressView({ percent, current, total, onCancel }: Props): React.JSX.Element {
   return (
     <Rows spacing="2u">
       <Title size="medium">Importing…</Title>
