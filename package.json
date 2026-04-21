@@ -16,6 +16,7 @@
     "test": "jest --no-cache",
     "test:watch": "jest --watchAll",
     "test:update": "npm run test -- -u",
+    "deploy": "npm run build && wrangler deploy",
     "postinstall": "tsx ./scripts/copy_env.ts"
   },
   "dependencies": {
@@ -86,6 +87,7 @@
     "webpack": "5.105.2",
     "webpack-cli": "6.0.1",
     "webpack-dev-server": "5.2.2",
+    "wrangler": "^4.84.0",
     "yargs": "17.7.2"
   },
   "engines": {
