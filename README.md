@@ -1,61 +1,96 @@
 # PageMint Canva app
 
-Canva app that imports a PageMint design into the active Canva page via a
-pasted share link. This is **Intent 020 Phase C** of the PageMint
-roadmap — see
-[`intents/020-design-tool-export.md`](https://github.com/cyberprophet/page-mint/blob/main/intents/020-design-tool-export.md)
-in the PageMint monorepo for the intent spec.
+Imports a [PageMint](https://page.mint.surf) design into the active Canva
+page as editable native elements — text and images — via the Apps SDK
+(`addElementAtPoint` / `addElementAtCursor` + `@canva/asset` `upload`).
+
+## Two entry modes
+
+### 1. Deep-link (one-click from PageMint)
+
+PageMint's "Canva에서 편집" button opens Canva with this app already
+launched and a short-lived share token in the URL hash:
+
+```
+https://www.canva.com/login/?redirect=%2Fdesign%3Fcreate%26type%3DPresentation%26ui%3D<CANVA_APP_UI>#t=<TOKEN>
+```
+
+On mount, the app reads `window.location.hash` for `t=<token>`, scrubs
+the token from the browser history, fetches
+`https://page.mint.surf/s/<token>`, parses the HTML, and inserts each
+importable element into the current Canva design.
+
+### 2. Standalone (manual share URL / token)
+
+Opening this app directly from inside Canva (no deep-link hash) shows a
+text input where users paste a PageMint share URL or bare token, plus a
+link out to PageMint for designing something new. Same import pipeline
+as the deep-link path — only the token source differs.
 
 ## Flow
 
 ```
-PageMint (page.mint.surf)
-    │
-    │  User clicks "Share" → gets a share link
-    │  (e.g. https://page.mint.surf/s/ABC123)
+PageMint (https://page.mint.surf)
+    │  "Canva에서 편집" → /api/design/export/canva/token
+    │  response { token, expires_at, share_url }
     ▼
-User copies the link
+window.open(
+  'https://www.canva.com/login/?redirect=…&ui=<CANVA_APP_UI>#t=<TOKEN>'
+)
 
 Canva editor
-    │
-    │  Apps → PageMint → paste link → Import
+    │  new Presentation design
+    │  PageMint app auto-launches via ui=<CANVA_APP_UI>
     ▼
 src/app.tsx
-    │
-    │  1. Normalize link → {origin}/s/{token}/image
-    │  2. fetch(imageUrl)           ← CORS-friendly PNG proxy on PageMint
-    │  3. upload({ type: "IMAGE", … })  ← Canva asset SDK
-    │  4. addNativeElement({ type: "IMAGE", ref })
+    │  1. Read token from window.location.hash
+    │  2. fetch(`${origin}/s/${token}`)   ← CORS-friendly `*` origin
+    │  3. DOMParser → body > section > children
+    │  4. Walk: h1-h6/p → addElementAtPoint({ type:'text', … })
+    │            img     → upload({ type:'image', … }) → addElementAtPoint({ type:'image', ref })
     ▼
-Design dropped onto the active Canva page
+Editable native Canva elements on the active page
 ```
 
-No OAuth server required on the PageMint side — the share link is public
-by design, and the `/s/{token}/image` endpoint is served with
-`Access-Control-Allow-Origin: *` so the fetch works from the Canva app
-origin. A future Phase C.2 PR may add authenticated "Browse my sessions"
-via OAuth2, but v1 ships the paste-URL flow because it is shippable today
-without any external review coupling.
+No OAuth, no session browsing, no backend changes. The PageMint
+`/s/{token}` endpoint is public by token possession and CORS-wildcarded
+so the Canva iframe can fetch it directly.
+
+## Build
+
+```
+npm install
+npm run typecheck
+npm run build    # → dist/app.js
+```
+
+`dist/app.js` is the single JS bundle uploaded to the Canva Developer
+Portal for the app entry.
 
 ## Local development
 
-1. `npm install`
-2. `npm run start` — webpack-dev-server
-3. In the [Canva Developer Portal](https://www.canva.com/developers/apps),
-   create a new App, point its "Development URL" at
-   `http://localhost:8080` (or whatever webpack-dev-server is using), and
-   install it into a test Canva design.
-4. In the test design, open **Apps → PageMint**, paste a PageMint share
-   link, click **Import**.
+```
+npm run start    # webpack-dev-server on http://localhost:8080
+```
 
-## Submission checklist (Canva marketplace, free tier)
+In the [Canva Developer Portal](https://www.canva.com/developers/apps),
+point the app's Development URL at `http://localhost:8080`, install it
+into a test design, and iterate. Ship the production bundle via the
+Portal's app upload page once tested.
 
-- [ ] App icon (512×512 PNG) added to `assets/icon.png`
-- [ ] Privacy policy URL published on page.mint.surf
-- [ ] Terms of service URL published on page.mint.surf
-- [ ] Screenshots (3-5) of the paste-link experience
-- [ ] Test PageMint share link that reviewers can use to verify import
-- [ ] Submit via the Canva Developer Portal "Submit for review" button
+## Marketplace submission
+
+First submission (2026-04-21) was rejected because the app was
+exclusively a deep-link entry point — opening it directly showed only
+an "empty state" telling users to return to PageMint. Canva required
+meaningful standalone functionality accessible from within Canva,
+"even if additional features are only available via the deep-link
+launch context" (full feedback reproduced in
+[ADR-016](https://github.com/Creative-deliverables/page-mint/blob/main/decisions/016-canva-marketplace-resubmission-standalone.md)
+of the PageMint meta repo).
+
+v0.2.0 adds the manual share-URL import form for the no-deep-link case,
+satisfying that bar while leaving the deep-link flow unchanged.
 
 ## License
 

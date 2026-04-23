@@ -2,7 +2,7 @@
   "$schema": "https://www.canva.dev/schemas/app-manifest.json",
   "id": "pagemint-canva-app",
   "name": "PageMint",
-  "description": "Paste a PageMint share link to drop the design onto your Canva page.",
+  "description": "Import a PageMint design into your Canva page as editable text and image elements. Works two ways: click \"Canva에서 편집\" in PageMint for a one-click deep-link import, or open this app directly in Canva and paste a PageMint share URL to import.",
   "type": "app",
   "permissions": [
     "canva:design:content:write",
