@@ -80,7 +80,7 @@
     "tree-kill": "1.2.2",
     "ts-jest": "29.4.1",
     "ts-loader": "9.5.4",
-    "tsx": "4.20.5",
+    "tsx": "4.22.4",
     "typescript": "5.9.2",
     "url-loader": "4.1.1",
     "webpack": "5.105.2",
